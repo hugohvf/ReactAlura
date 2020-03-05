@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import FormValidator from '../../utils/FormValidador';
 import PopUp from '../../utils/PopUp';
-
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Toast from '../Toast/Toast';
 class Formulario extends Component {
 
     constructor(props) {
@@ -33,7 +36,12 @@ class Formulario extends Component {
             nome: '',
             livro: '',
             preco: '',
-            validacao: this.validador.valido()
+            validacao: this.validador.valido(),
+            mensagem: {
+                open: false,
+                texto: '',
+                tipo: 'success'
+            }
         }
 
         this.state = this.stateInicial;
@@ -51,9 +59,15 @@ class Formulario extends Component {
             const camposInvalidos = campos.filter(elem => {
                 return elem.isInvalid;
             });
-            camposInvalidos.forEach(campo => {
-                PopUp.exibeMensagem('error', campo.message)
-            });
+            console.log(camposInvalidos);
+            const erros = camposInvalidos.reduce((texto, campo) => campo.message + '. ' + texto, '')
+            this.setState({
+                mensagem: {
+                    open: true,
+                    texto: erros,
+                    tipo: 'error'
+                }
+            })
         }
 
     }
@@ -71,44 +85,29 @@ class Formulario extends Component {
     render() {
         const { nome, livro, preco } = this.state;
         return (
+            <>
+            <Toast open={this.state.mensagem.open} handleClose={() => this.setState({mensagem: {open: false}})} severity={this.state.mensagem.tipo}>{this.state.mensagem.texto}</Toast>
             <form>
-                <div className="row">
-                    <div className="input-field col s4">
-                        <label className="input-field" htmlFor="nome">Nome</label>
-                        <input
-                            className="validate"
-                            id="nome"
-                            type="text"
-                            name="nome"
-                            value={nome}
-                            onChange={this.escutadorDeInput} />
-                    </div>
-                    <div className="input-field col s4">
-                        <label className="input-field" htmlFor="livro">Livro</label>
-                        <input
-                            className="validate"
-                            id="livro"
-                            type="text"
-                            name="livro"
-                            value={livro}
-                            onChange={this.escutadorDeInput} />
+                <Grid container spacing={3} alignItems="center">
+                    <Grid item>
+                        <TextField id="nome" name='nome' label="Nome" variant="outlined" value={nome} onChange={this.escutadorDeInput}/>
+                    </Grid>
+                    <Grid item>
+                        <TextField id="livro" name='livro' label="Livro" variant="outlined" value={livro} onChange={this.escutadorDeInput}/>
+                    </Grid>
+                    <Grid item>
+                        <TextField id="preco" name='preco' label="Preço" variant="outlined" value={preco} onChange={this.escutadorDeInput}/>
+                    </Grid>
+                    <Grid item>
+                        <Button onClick={this.submitFormulario} variant='contained' color='primary' type="button">
+                            Salvar
+                        </Button>
+                    </Grid>
+                </Grid>
 
-                    </div>
-                    <div className="input-field col s4">
-                        <label className="input-field col s4" htmlFor="preco">Preço</label>
-                        <input
-                            className="validate"
-                            id="preco"
-                            type="text"
-                            name="preco"
-                            value={preco}
-                            onChange={this.escutadorDeInput} />
-                    </div>
-                </div>
-
-                <button onClick={this.submitFormulario} className="btn waves-effect waves-light indigo lighten-2" type="button">Salvar
-                </button>
+                
             </form>
+            </>
         );
     }
 }

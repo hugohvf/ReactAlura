@@ -35,7 +35,13 @@ class App extends Component {
    
   }
 
-  escutadorDeSubmit = autor => {
+  escutadorDeSubmit = dados => {
+    const autor = {
+      nome: dados.nome,
+      livro: dados.livro,
+      preco: dados.preco
+    }
+    
     ApiService.CriaAutor(JSON.stringify(autor))
       .then(res => {
         if(res.message === 'success'){
@@ -62,14 +68,20 @@ class App extends Component {
   }
 
   render() {
-
+    const campos = [{titulo: 'Autores', dado: 'nome'}, 
+                    {titulo: 'Livros', dado: 'livro'},
+                    {titulo: 'Preços', dado: 'preco'}
+                  ]
     return (
       <Fragment>
         <Header />
         <div className="container mb-10">
           <h1>Casa do Código</h1>
-          <Tabela autores={this.state.autores} removeAutor={this.removeAutor} />
           <Form escutadorDeSubmit={this.escutadorDeSubmit} />
+          <Tabela 
+            campos={campos}
+            dados={this.state.autores} 
+            removeDados={this.removeAutor} />
         </div>
       </Fragment>
     );
